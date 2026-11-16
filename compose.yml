@@ -1,0 +1,21 @@
+services:
+  cf-rpi-apps:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare_tunnel_rpi_apps
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./rpi-apps/config.yml:/etc/cloudflared/config.yml:ro
+      - ./rpi-apps/credentials.json:/etc/cloudflared/credentials.json:ro
+    networks:
+      - rpi_apps_network
+    healthcheck:
+      test: ["CMD", "cloudflared", "version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  rpi_apps_network:
+    name: rpi_apps_network
+    driver: bridge
